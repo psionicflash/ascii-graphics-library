@@ -22,7 +22,6 @@ typedef struct polygon {
 } polygon_t;
 
 do we need shape types at the moment
-
 */
 
 screen_t screen_init(int width, int height, char bgchar) {
