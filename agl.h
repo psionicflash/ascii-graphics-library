@@ -11,6 +11,9 @@ typedef struct point {
 screen_t screen_init(int width, int height, char bgchar);
 void output(screen_t *screen);
 void clear(screen_t *screen);
+int convertX(int initX, int screenWidth);
+int convertY(int initY, int screenHeight);
+point_t convertPoint(point_t initPoint, int screenW, int screenH);
 void drawPoint(screen_t *screen, int x, int y, char setChar);
 void drawRect(screen_t *screen, int tlx, int tly, int brx, int bry, int fill, char setChar);
 void drawLine(screen_t *screen, int x0, int y0, int x1, int y1, char setChar);

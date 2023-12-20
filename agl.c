@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
 
 typedef struct screen {
     char * sp;
@@ -39,16 +40,17 @@ screen_t screen_init(int width, int height, char bgchar) {
 }
 
 int convertX(int initX, int screenWidth) {
-    return ((screenWidth/2) + initX);
+    return trunc((screenWidth/2) + initX);
 }
 
 int convertY(int initY, int screenHeight) {
-    return ((screenHeight/2) - initY);
+    return trunc((screenHeight/2) - initY);
 }
 
-int convertPoint(point_t initPoint, int screenW, int screenH) {
-    initPoint.x = screenW/2 + initPoint.x;
-    initPoint.y = screenH/2 - initPoint.y
+point_t convertPoint(point_t initPoint, int screenW, int screenH) {
+    initPoint.x = trunc(screenW/2 + initPoint.x);
+    initPoint.y = trunc(screenH/2 - initPoint.y);
+    return initPoint;
 }
 
 void output(screen_t *screen) {
@@ -76,8 +78,10 @@ void drawPoint(screen_t *screen, int x, int y, char setChar) {
 }
 
 void drawRect(screen_t *screen, int tlx, int tly, int brx, int bry, int fill, char setChar) {
-    x = convertX(x, screen->width);
-    y = convertY(y, screen->height);
+    tlx = convertX(tlx, screen->width);
+    tly = convertY(tly, screen->height);
+    brx = convertX(brx, screen->width);
+    bry = convertY(bry, screen->width);
     for (int i = tly; i <= bry; i++) {
 	for (int i2 = tlx; i2 <= brx; i2++) {
 	    if (!fill & (i == tly | i == bry | i2 == tlx | i2 == brx)) {
@@ -91,8 +95,10 @@ void drawRect(screen_t *screen, int tlx, int tly, int brx, int bry, int fill, ch
 }
 
 void drawLine(screen_t *screen, int x0, int y0, int x1, int y1, char setChar) {
-    x = convertX(x, screen->width);
-    y = convertY(y, screen->height);
+    x0 = convertX(x0, screen->width);
+    y0 = convertY(y0, screen->height);
+    x1 = convertX(x1, screen->width);
+    y1 = convertY(y1, screen->height);
     printf("x0: %d\ny0: %d\nx1: %d\ny1: %d\n", x0, y0, x1, y1);
     int dx = x1 - x0;
     int dy = y1 - y0;
@@ -151,8 +157,9 @@ void drawLine(screen_t *screen, int x0, int y0, int x1, int y1, char setChar) {
 
 
 void drawPolygon(screen_t *screen, point_t vertices[], int numOfVertices, char setChar) {
-    x = convertX(x, screen->width);
-    y = convertY(y, screen->height);
+    for (int i = 0; i < numOfVertices; i++) {
+	vertices[i] = convertPoint(vertices[i], screen->width, screen->height);
+    } 
     for (int i = 0; i < numOfVertices; i++) {
 	if (i < (numOfVertices - 1)) {
             printf("x1: %d\n y1: %d\n x2: %d\n y2: %d\n i: %d\n", vertices[i].x, vertices[i].y, vertices[i+1].x, vertices[i + 1].y, i);                      drawLine(screen, vertices[i].x, vertices[i].y, vertices[i+1].x, vertices[i + 1].y, setChar);
