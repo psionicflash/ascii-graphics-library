@@ -38,6 +38,19 @@ screen_t screen_init(int width, int height, char bgchar) {
     return screen;
 }
 
+int convertX(int initX, int screenWidth) {
+    return ((screenWidth/2) + initX);
+}
+
+int convertY(int initY, int screenHeight) {
+    return ((screenHeight/2) - initY);
+}
+
+int convertPoint(point_t initPoint, int screenW, int screenH) {
+    initPoint.x = screenW/2 + initPoint.x;
+    initPoint.y = screenH/2 - initPoint.y
+}
+
 void output(screen_t *screen) {
     for (int i = 0; i < screen->size; i++) {
 	printf("%c", *(screen->sp + i));
@@ -52,6 +65,8 @@ void clear(screen_t *screen) {
 }
 
 void drawPoint(screen_t *screen, int x, int y, char setChar) {
+    x = convertX(x, screen->width);
+    y = convertY(y, screen->height);
     if (x == screen->width | y == screen->height | x < 0 | y < 0) {
 	printf("Out of bounds.\n");
 	return;
@@ -61,6 +76,8 @@ void drawPoint(screen_t *screen, int x, int y, char setChar) {
 }
 
 void drawRect(screen_t *screen, int tlx, int tly, int brx, int bry, int fill, char setChar) {
+    x = convertX(x, screen->width);
+    y = convertY(y, screen->height);
     for (int i = tly; i <= bry; i++) {
 	for (int i2 = tlx; i2 <= brx; i2++) {
 	    if (!fill & (i == tly | i == bry | i2 == tlx | i2 == brx)) {
@@ -74,6 +91,8 @@ void drawRect(screen_t *screen, int tlx, int tly, int brx, int bry, int fill, ch
 }
 
 void drawLine(screen_t *screen, int x0, int y0, int x1, int y1, char setChar) {
+    x = convertX(x, screen->width);
+    y = convertY(y, screen->height);
     printf("x0: %d\ny0: %d\nx1: %d\ny1: %d\n", x0, y0, x1, y1);
     int dx = x1 - x0;
     int dy = y1 - y0;
@@ -129,10 +148,11 @@ void drawLine(screen_t *screen, int x0, int y0, int x1, int y1, char setChar) {
 // CHANGE 
 // keep old functions but append Raw
 // never mind just use _Generic for function overloading lmao
-// never never mind only use _Generic once Raw works just in case
 
 
 void drawPolygon(screen_t *screen, point_t vertices[], int numOfVertices, char setChar) {
+    x = convertX(x, screen->width);
+    y = convertY(y, screen->height);
     for (int i = 0; i < numOfVertices; i++) {
 	if (i < (numOfVertices - 1)) {
             printf("x1: %d\n y1: %d\n x2: %d\n y2: %d\n i: %d\n", vertices[i].x, vertices[i].y, vertices[i+1].x, vertices[i + 1].y, i);                      drawLine(screen, vertices[i].x, vertices[i].y, vertices[i+1].x, vertices[i + 1].y, setChar);
