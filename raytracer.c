@@ -6,16 +6,43 @@
 #define inf 30000000
 
 int main() {
-    scene_t myScene = initScene(3, ' ');
-    /*  verifies if the initializer works
-        for (int i = 0; i < myScene.sphereCount; i++) {
+    
+    int sphereCount = 3;
+    char color = ' ';
+    printf("Input number of spheres you would like to render: ");
+    scanf(" %d", &sphereCount);
+    printf("Input background color (character) of the scene: ");
+    scanf(" %c", &color);
+    scene_t myScene = initScene(sphereCount, color);
+
+    //  verifies if the initializer works
+    for (int i = 0; i < myScene.sphereCount; i++) {
 	printf("Sphere %d color: %c\n", i, (myScene.spheres + i)->color); 
 	printf("Sphere %d radius: %f\n", i, (myScene.spheres + i)->radius);
 	printf("Sphere %d center: %f, %f, %f\n", i, (myScene.spheres + i)->center.x, (myScene.spheres + i)->center.y, (myScene.spheres + i)->center.z);
     }
-    */
+    int sx, sy, sz, r;
+    for (int i = 0; i < myScene.sphereCount; i++) {
+	printf("Input color (character) of sphere %d: ", i);
+	scanf(" %c", &color);
+	printf("Input x value of sphere %d: ", i);
+	scanf("%f", &sx);
+	printf("You typed in: %f\n", sx);
+	printf("Input y value of sphere %d: ", i);
+	scanf("%f", &sy);
+	printf("You typed in: %f\n", sy);
+	printf("Input z value of sphere %d: ", i);
+	scanf("%f", &sz);
+	printf("You typed in: %f\n", sz);
+	printf("Input radius of sphere %d: ", i);
+	scanf("%f", &r);
+	printf("You typed in: %f\n", r);
+	(myScene.spheres + i)->center = vectCopy(((myScene.spheres + i)->center), sx, sy, sz);
+	(myScene.spheres + i)->color = color;
+	(myScene.spheres + i)->radius = r;
+    }
     
-    //sample scene
+    // sample scene i used for testing
     (myScene.spheres + 0)-> center = vectCopy(((myScene.spheres + 0)->center), 0, -1, 3);
     (myScene.spheres + 0)->color = 'X';
     
@@ -25,19 +52,19 @@ int main() {
     (myScene.spheres + 2)-> center = vectCopy(((myScene.spheres + 2)->center), -2, 0, 4);
     (myScene.spheres + 2)->color = '*';
 
-    /* verifies if values can change
+    // verifies if values were changed properly
     printf("Values changed.\n");
     for (int i = 0; i < myScene.sphereCount; i++) {
 	printf("Sphere %d color: %c\n", i, (myScene.spheres + i)->color); 
 	printf("Sphere %d radius: %f\n", i, (myScene.spheres + i)->radius);
 	printf("Sphere %d center: %f, %f, %f\n", i, (myScene.spheres + i)->center.x, (myScene.spheres + i)->center.y, (myScene.spheres + i)->center.z);
-    }*/
+    }
     
     vec3_t origin = {0, 0, 0};
     vec3_t direction = {0, 0, 0};
+
     /*
     // verifies the interesction algorithm
-    /*
     printf("select a sphere:\n");
     int i;
     scanf(" %d", &i);

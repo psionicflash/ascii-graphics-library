@@ -2,17 +2,18 @@
 #include <stdio.h>
 #include <math.h>
 #include "agl_2d_drawing.h"
+#define inf 30000000
 typedef struct viewport {
     int width, height, distance;
 } viewport_t;
 
 typedef struct vec3 {
-    int x, y, z;
+    float x, y, z;
 } vec3_t;
 
 typedef struct sphere {
     vec3_t center;
-    int radius;
+    float radius;
     char color;
 } sphere_t;
 
@@ -22,7 +23,7 @@ typedef struct scene {
     sphere_t *spheres;
 } scene_t;
 
-int dot(vec3_t vector1, vec3_t vector2) {
+float dot(vec3_t vector1, vec3_t vector2) {
     return (vector1.x * vector2.x) + (vector1.y * vector2.y) + (vector1.z * vector2.z);
 }
 
@@ -32,6 +33,42 @@ vec3_t vectSub(vec3_t vector1, vec3_t vector2) {
     vector3.y = vector1.y - vector2.y;
     vector3.z = vector1.z - vector2.z;
     return vector3;
+}
+
+vec3_t vectCopy(vec3_t vector, float x, float y, float z) {
+    vector.x = x;
+    vector.y = y;
+    vector.z = z;
+    return vector;
+}
+
+int sphereCompare(sphere_t sphere1, sphere_t sphere2) {
+   int result;
+   if (sphere1.center.x == sphere2.center.x && sphere1.center.y == sphere2.center.y && sphere1.center.z == sphere2.center.z && sphere1.radius == sphere2.radius && sphere1.color == sphere2.color) {
+       return 1;
+   }
+   return 0;
+}
+
+vec3_t screenToViewport(int x, int y, viewport_t viewport, int screenW, int screenH) {
+    printf("viewport width: %d\n", viewport.width);
+    printf("screen width: %d\n", screenW);
+    printf("x: %d\n", x);
+    float widthRatio = ((float) viewport.width/screenW);
+    printf("width ratio: %f\n", widthRatio);
+    float heightRatio = ((float) viewport.height/screenH);
+    printf("height ratio: %f\n", heightRatio);
+    float newX = x * ((float) viewport.width/screenW);
+    printf("converted x: %f\n", newX);
+    float newY = y * ((float) viewport.height/screenH);
+    printf("y: %d\n", y);
+    printf("converted y: %f", newY);
+    vec3_t vector = {newX, newY, viewport.distance};
+    return vector;
+}
+
+void printVect(vec3_t *vector) {
+    printf("x: %f\ny: %f\nz: %f\n", vector->x, vector->y, vector->z);
 }
 
 scene_t initScene(int sphereCount, char bgChar) {
@@ -53,79 +90,63 @@ scene_t initScene(int sphereCount, char bgChar) {
     return scene;
 }
 
-int rsIntersect(vec3_t origin, vec3_t direction, sphere_t* sphere) {
+float rsIntersect(vec3_t origin, vec3_t direction, sphere_t* sphere) {
     int tClosest = 4294967295;
-    int radius = sphere->radius;
+    float radius = sphere->radius;
     vec3_t center = sphere->center; 
+    //correct
     vec3_t ocDist = vectSub(origin, center);
-    printf("direction: {%d, %d, %d}\n", direction.x, direction.y, direction.z);
-    printf("center: {%d, %d, %d}\n", center.x, center.y, center.z);
-    printf("origin: {%d, %d, %d}\n", origin.x, origin.y, origin.z);
-    printf("ocDist: {%d, %d, %d}\n", ocDist.x, ocDist.y, ocDist.z);
+    printf("direction: {%f, %f, %f}\n", direction.x, direction.y, direction.z);
+    printf("center: {%f, %f, %f}\n", center.x, center.y, center.z);
+    printf("origin: {%f, %f, %f}\n", origin.x, origin.y, origin.z);
+    printf("ocDist: {%f, %f, %f}\n", ocDist.x, ocDist.y, ocDist.z);
 
-    int a = dot(direction, direction);
-    int b = 2 * dot(ocDist, direction);
-    int c = dot(ocDist, ocDist) - (radius * radius);
-    printf("a: %d\nb: %d\nc: %d\n", a, b, c);
+    //correct
+    float a = dot(direction, direction);
+    //correct
+    float b = 2 * dot(ocDist, direction);
+    //correct
+    float c = dot(ocDist, ocDist) - (radius * radius);
+    printf("a: %f\nb: %f\nc: %f\n", a, b, c);
 
 
-    int discriminant = b*b - 4*a*c;
-    printf("discriminant: %d\n", discriminant);
+    float discriminant = ((b*b) - (4*a*c));
+    printf("discriminant: %f\n", discriminant);
     if (discriminant < 0) {
-	return 429467295;
+	return inf;
     }
     
     
     float t1 = (-b + sqrt(discriminant))/(2*a);
     float t2 = (-b - sqrt(discriminant))/(2*a);
-    printf("t1: %f\nt2: %f\n", t1, t1);
+    printf("t1: %f\nt2: %f\n", t1, t2);
 
     if (t1 < t2) {
+	printf("returning t1\n");
 	return t1;
     }
-
+    printf("returning t2\n");
     return t2;
 } 
 
-int main() {
-    scene_t myScene = initScene(3, 'x');
-    for (int i = 0; i < myScene.sphereCount; i++) {
-	printf("Sphere %d color: %c\n", i, (myScene.spheres + i)->color); 
-	printf("Sphere %d radius: %d\n", i, (myScene.spheres + i)->radius);
-	printf("Sphere %d center: %d, %d, %d\n", i, (myScene.spheres + i)->center.x, (myScene.spheres + i)->center.y, (myScene.spheres + i)->center.z);
+char traceRay(vec3_t origin, vec3_t direction, scene_t *scene, float maxT, float minT) {
+    float closest_t = inf; 
+    float t;
+    sphere_t closest_sphere = {{inf,inf,inf}, -1, '\0'};
+    sphere_t null_sphere = {{inf,inf,inf}, -1, '\0'};
+    for (int i = 0; i < (scene->sphereCount); i++) {
+	t = rsIntersect(origin, direction, (scene->spheres + i));
+	printf("t: %f\n", t);
+	if ((minT < t < maxT) && t < closest_t) {
+	    closest_t = t;
+	    printf("closest t: %f\n", closest_t);
+	    closest_sphere = *(scene->spheres + i);
+	}
     }
-    
-    (myScene.spheres + 0)->center.x = 0;
-    (myScene.spheres + 0)->center.y = -1;
-    (myScene.spheres + 0)->center.z = 3;
-    (myScene.spheres + 0)->color = 'X';
-
-    (myScene.spheres + 1)->center.x  = 2;
-    (myScene.spheres + 1)->center.y  = 0;
-    (myScene.spheres + 1)->center.z  = 4;
-    (myScene.spheres + 1)->color = '[';
-
-    (myScene.spheres + 2)->center.x = -2;
-    (myScene.spheres + 2)->center.y = 0;
-    (myScene.spheres + 2)->center.z = 4;
-    (myScene.spheres + 2)->color = 'M';
-
-    printf("Values changed.\n");
-
-    for (int i = 0; i < myScene.sphereCount; i++) {
-	printf("Sphere %d color: %c\n", i, (myScene.spheres + i)->color); 
-	printf("Sphere %d radius: %d\n", i, (myScene.spheres + i)->radius);
-	printf("Sphere %d center: %d, %d, %d\n", i, (myScene.spheres + i)->center.x, (myScene.spheres + i)->center.y, (myScene.spheres + i)->center.z);
+    if (sphereCompare(closest_sphere,null_sphere) == 1) {
+	return scene->bgChar;
     }
-
-    vec3_t origin = {0, 0, 0};
-    vec3_t direction = {-2, 0, 4};
-    printf("select a sphere:\n");
-    int i;
-    scanf(" %d", &i);
-    printf("Intersection test: %d", rsIntersect(origin, direction, (myScene.spheres + i)));
-
-    return 0;
+    return closest_sphere.color;
 }
 
 
