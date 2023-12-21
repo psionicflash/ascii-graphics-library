@@ -21,21 +21,21 @@ int main() {
 	printf("Sphere %d radius: %f\n", i, (myScene.spheres + i)->radius);
 	printf("Sphere %d center: %f, %f, %f\n", i, (myScene.spheres + i)->center.x, (myScene.spheres + i)->center.y, (myScene.spheres + i)->center.z);
     }
-    int sx, sy, sz, r;
+    float sx, sy, sz, r;
     for (int i = 0; i < myScene.sphereCount; i++) {
 	printf("Input color (character) of sphere %d: ", i);
 	scanf(" %c", &color);
 	printf("Input x value of sphere %d: ", i);
-	scanf("%f", &sx);
+	scanf(" %f", &sx);
 	printf("You typed in: %f\n", sx);
 	printf("Input y value of sphere %d: ", i);
-	scanf("%f", &sy);
+	scanf("% f", &sy);
 	printf("You typed in: %f\n", sy);
 	printf("Input z value of sphere %d: ", i);
-	scanf("%f", &sz);
+	scanf(" %f", &sz);
 	printf("You typed in: %f\n", sz);
 	printf("Input radius of sphere %d: ", i);
-	scanf("%f", &r);
+	scanf(" %f", &r);
 	printf("You typed in: %f\n", r);
 	(myScene.spheres + i)->center = vectCopy(((myScene.spheres + i)->center), sx, sy, sz);
 	(myScene.spheres + i)->color = color;
