@@ -17,14 +17,27 @@ typedef struct sphere {
     char color;
 } sphere_t;
 
+typedef struct light {
+  //0 = ambient, 1 = directional, 2 = point
+  float type;
+  float intensity;
+  vec3_t position_direction;
+} light_t;
+
 typedef struct scene {
     int sphereCount;
+    int lightCount;
     char bgChar;
     sphere_t *spheres;
+    light_t *lights;
 } scene_t;
 
 float dot(vec3_t vector1, vec3_t vector2) {
     return (vector1.x * vector2.x) + (vector1.y * vector2.y) + (vector1.z * vector2.z);
+}
+
+float vectLength(vec3_t vector) {
+    return abs(sqrt((vector.x * vector.x) + (vector.y * vector.y) + (vector.z * vector.z)));
 }
 
 vec3_t vectSub(vec3_t vector1, vec3_t vector2) {
@@ -33,6 +46,19 @@ vec3_t vectSub(vec3_t vector1, vec3_t vector2) {
     vector3.y = vector1.y - vector2.y;
     vector3.z = vector1.z - vector2.z;
     return vector3;
+}
+
+vec3_t vectScalarMult(vec3_t vector, float mult) {
+    vector.x = vector.x * mult;
+    vector.y = vector.y * mult;
+    vector.z = vector.z * mult;
+    return vector;
+}
+
+vec3_t vectNormalize(vec3_t vector) {
+    float mult = vectLength(vector);
+    mult = 1/mult;
+    return vectScalarMult(vector, mult);
 }
 
 vec3_t vectCopy(vec3_t vector, float x, float y, float z) {
@@ -71,23 +97,59 @@ void printVect(vec3_t *vector) {
     printf("x: %f\ny: %f\nz: %f\n", vector->x, vector->y, vector->z);
 }
 
-scene_t initScene(int sphereCount, char bgChar) {
+scene_t initScene(int sphereCount, int lightCount, char bgChar) {
     scene_t scene;
     vec3_t defaultVect = {0, 0, 0};
     scene.bgChar = bgChar;
     scene.sphereCount = sphereCount;
 
     if (sphereCount <= 0) {
-	scene.spheres = NULL;
-	return scene;
+      scene.spheres = NULL;
+      return scene;
     }
+
+    if (lightCount <= 0) {
+      scene.lights = NULL;
+    }
+
     scene.spheres = (sphere_t*)malloc(sphereCount*sizeof(sphere_t));
     for (int i = 0; i < sphereCount; i++) {
-	(scene.spheres + i)->radius = 1;
-	(scene.spheres + i)->center = defaultVect;
-	(scene.spheres + i)->color = 'H';
+      (scene.spheres + i)->radius = 1;
+      (scene.spheres + i)->center = defaultVect;
+      (scene.spheres + i)->color = 'H';
     }
+
+    scene.lights = (light_t*)malloc(lightCount*sizeof(light_t));
+    for (int i = 0; i < lightCount; i++) {
+      (scene.lights + i)->type = 0;
+      (scene.lights + i)->intensity = 1.0;
+      (scene.lights + i)->position_direction = defaultVect;
+    }
+
     return scene;
+}
+
+float compLight(scene_t *scene, vec3_t point, vec3_t normal) {
+    float intensity = 0.0;
+    vec3_t lVect;
+    float nlDot;
+    for (int i = 0; i < scene->lightCount; i++) {
+        if ((scene->lights + i)->type == 0) {
+            intensity += (scene->lights + i)->intensity;
+        } else { 
+            if ((scene->lights + i)->type == 1) {
+                lVect = (scene->lights + i)->position_direction;
+            }
+            if ((scene->lights + i)->type == 2) {
+                lVect = vectSub((scene->lights + i)->position_direction, point);
+            }
+            nlDot = dot(normal, lVect);
+            if (nlDot > 0) {
+                intensity += (scene->lights + i)->intensity * nlDot/(vectLength(normal) * vectLength(lVect));
+            }
+        }
+    }
+    return intensity;
 }
 
 float rsIntersect(vec3_t origin, vec3_t direction, sphere_t* sphere) {
@@ -135,16 +197,16 @@ char traceRay(vec3_t origin, vec3_t direction, scene_t *scene, float maxT, float
     sphere_t closest_sphere = {{inf,inf,inf}, -1, '\0'};
     sphere_t null_sphere = {{inf,inf,inf}, -1, '\0'};
     for (int i = 0; i < (scene->sphereCount); i++) {
-	t = rsIntersect(origin, direction, (scene->spheres + i));
-	printf("t: %f\n", t);
-	if ((minT < t < maxT) && t < closest_t) {
-	    closest_t = t;
-	    printf("closest t: %f\n", closest_t);
-	    closest_sphere = *(scene->spheres + i);
-	}
+      t = rsIntersect(origin, direction, (scene->spheres + i));
+      printf("t: %f\n", t);
+      if ((minT < t < maxT) && t < closest_t) {
+          closest_t = t;
+          printf("closest t: %f\n", closest_t);
+          closest_sphere = *(scene->spheres + i);
+      }
     }
     if (sphereCompare(closest_sphere,null_sphere) == 1) {
-	return scene->bgChar;
+          return scene->bgChar;
     }
     return closest_sphere.color;
 }

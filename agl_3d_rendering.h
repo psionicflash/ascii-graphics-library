@@ -23,11 +23,15 @@ typedef struct scene {
 } scene_t;
 
 float dot(vec3_t vector1, vec3_t vector2);
+float vectLength(vec3_t vector);
+vec3_t vectScalarMult(vec3_t vector, float mult);
+vec3_t vectNormalize(vec3_t vector);
 vec3_t vectSub(vec3_t vector1, vec3_t vector2);
 vec3_t vectCopy(vec3_t vector, float x, float y, float z);
+void printVect(vec3_t *vector); 
+
 int sphereCompare(sphere_t sphere1, sphere_t sphere2);
 vec3_t screenToViewport(int x, int y, viewport_t viewport, int screenW, int screenH);
-void printVect(vec3_t *vector); 
 scene_t initScene(int sphereCount, char bgChar);
 float rsIntersect(vec3_t origin, vec3_t direction, sphere_t* sphere);
 char traceRay(vec3_t origin, vec3_t direction, scene_t *scene, float maxT, float minT);
