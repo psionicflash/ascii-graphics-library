@@ -6,13 +6,15 @@
 #define inf 30000000
 
 int main() {
-    int sphereCount = 3;
-    char color = ' ';
+    int sphereCount, lightCount;
+    char color;
     printf("Input number of spheres you would like to render: ");
     scanf(" %d", &sphereCount);
+    printf("Input number of lights you would like to render: ");
+    scanf(" %d", &lightCount);
     printf("Input background color (character) of the scene: ");
     fgets(&color,1,stdin);
-    scene_t myScene = initScene(sphereCount, color);
+    scene_t myScene = initScene(sphereCount, lightCount, color);
 
     //  verifies if the initializer works
     for (int i = 0; i < myScene.sphereCount; i++) {
@@ -21,7 +23,7 @@ int main() {
       printf("Sphere %d center: %f, %f, %f\n", i, (myScene.spheres + i)->center.x, (myScene.spheres + i)->center.y, (myScene.spheres + i)->center.z);
     }
 
-    float sx, sy, sz, r;
+    float sx, sy, sz, r, i, t;
     for (int i = 0; i < myScene.sphereCount; i++) {
       printf("Input color (character) of sphere %d: ", i);
       scanf(" %c", &color);
@@ -38,6 +40,8 @@ int main() {
       (myScene.spheres + i)->color = color;
       (myScene.spheres + i)->radius = r;
     }
+
+    
     
     // sample scene i used for testing
     /*
