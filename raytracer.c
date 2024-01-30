@@ -23,7 +23,6 @@ int main() {
       printf("Sphere %d center: %f, %f, %f\n", i, (myScene.spheres + i)->center.x, (myScene.spheres + i)->center.y, (myScene.spheres + i)->center.z);
     }
 
-    /*
     float sx, sy, sz, r;
     for (int i = 0; i < myScene.sphereCount; i++) {
       printf("Input color (character) of sphere %d: ", i);
@@ -52,9 +51,10 @@ int main() {
       (myScene.spheres + i)->radius = r;
       printf("Sphere Radius initialized!");
     }
-    */
+    
     
     // sample scene i used for testing
+    /*
     (myScene.spheres + 0)-> center = vectCopy(((myScene.spheres + 0)->center), 0, -1, 3);
     (myScene.spheres + 0)->color = 'X';
     
@@ -63,6 +63,7 @@ int main() {
 
     (myScene.spheres + 2)-> center = vectCopy(((myScene.spheres + 2)->center), -2, 0, 4);
     (myScene.spheres + 2)->color = '*';
+    */
 
     // verifies if values were changed properly
     printf("Values changed.\n");
