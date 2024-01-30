@@ -11,8 +11,10 @@ int main() {
     printf("Input number of spheres you would like to render: ");
     scanf(" %d", &sphereCount);
     printf("Input background color (character) of the scene: ");
-    fgets(&color,1,stdin);
+    scanf(" %c", &color);
     scene_t myScene = initScene(sphereCount, color);
+
+    printVect(&((myScene.spheres)->center));
 
     //  verifies if the initializer works
     for (int i = 0; i < myScene.sphereCount; i++) {
@@ -21,26 +23,38 @@ int main() {
       printf("Sphere %d center: %f, %f, %f\n", i, (myScene.spheres + i)->center.x, (myScene.spheres + i)->center.y, (myScene.spheres + i)->center.z);
     }
 
+    /*
     float sx, sy, sz, r;
     for (int i = 0; i < myScene.sphereCount; i++) {
       printf("Input color (character) of sphere %d: ", i);
       scanf(" %c", &color);
+      printf("You typed in: %c\n", color);
+
       printf("Input x value of sphere %d: ", i);
       scanf(" %f", &sx);
+      printf("You typed in: %f\n", sx);
+
       printf("Input y value of sphere %d: ", i);
       scanf(" %f", &sy);
+      printf("You typed in: %f\n", sy);
+
       printf("Input z value of sphere %d: ", i);
       scanf(" %f", &sz);
+      printf("You typed in: %f\n", sz);
+
       printf("Input radius of sphere %d: ", i);
       scanf(" %f", &r);
       printf("You typed in: %f\n", r);
-      (myScene.spheres + i)->center = vectCopy(((myScene.spheres + i)->center), sx, sy, sz);
+      (myScene.spheres + i)->center = vectCopy(((myScene.spheres + i)->center), sx, sy, sz);  
+      printf("Sphere Coordinates initialized!");
       (myScene.spheres + i)->color = color;
+      printf("Sphere Color initialized!");
       (myScene.spheres + i)->radius = r;
+      printf("Sphere Radius initialized!");
     }
+    */
     
     // sample scene i used for testing
-    /*
     (myScene.spheres + 0)-> center = vectCopy(((myScene.spheres + 0)->center), 0, -1, 3);
     (myScene.spheres + 0)->color = 'X';
     
@@ -49,7 +63,6 @@ int main() {
 
     (myScene.spheres + 2)-> center = vectCopy(((myScene.spheres + 2)->center), -2, 0, 4);
     (myScene.spheres + 2)->color = '*';
-    */
 
     // verifies if values were changed properly
     printf("Values changed.\n");
@@ -100,7 +113,7 @@ int main() {
 
     screen_t myScreen = screen_init(screenWidth, screenHeight, bgChar);
 
-    int viewportW = 2, viewportH = 2, viewportD = 1;
+    int viewportW = 1, viewportH = 1, viewportD = 1;
     viewport_t myViewport = {viewportW, viewportH, viewportD};
 
     char charToDraw;

@@ -17,19 +17,21 @@ typedef struct sphere {
     char color;
 } sphere_t;
 
+/*
 typedef struct light {
   //0 = ambient, 1 = directional, 2 = point
   float type;
   float intensity;
   vec3_t position_direction;
 } light_t;
+*/
 
 typedef struct scene {
     int sphereCount;
-    int lightCount;
+    //int lightCount;
     char bgChar;
     sphere_t *spheres;
-    light_t *lights;
+    // light_t *lights;
 } scene_t;
 
 float dot(vec3_t vector1, vec3_t vector2) {
@@ -97,7 +99,7 @@ void printVect(vec3_t *vector) {
     printf("x: %f\ny: %f\nz: %f\n", vector->x, vector->y, vector->z);
 }
 
-scene_t initScene(int sphereCount, int lightCount, char bgChar) {
+scene_t initScene(int sphereCount, char bgChar) {
     scene_t scene;
     vec3_t defaultVect = {0, 0, 0};
     scene.bgChar = bgChar;
@@ -108,27 +110,36 @@ scene_t initScene(int sphereCount, int lightCount, char bgChar) {
       return scene;
     }
 
+    /*
     if (lightCount <= 0) {
       scene.lights = NULL;
     }
+    */
 
     scene.spheres = (sphere_t*)malloc(sphereCount*sizeof(sphere_t));
     for (int i = 0; i < sphereCount; i++) {
       (scene.spheres + i)->radius = 1;
+      printf("scene init test (radius): %f\n", (scene.spheres + i)->radius);
       (scene.spheres + i)->center = defaultVect;
+      printf("scene init test (center):\n");
+      printVect(&((scene.spheres + i)->center));
       (scene.spheres + i)->color = 'H';
+      printf("scene init test (color): %c\n", (scene.spheres + i)->color);
     }
 
+    /*
     scene.lights = (light_t*)malloc(lightCount*sizeof(light_t));
     for (int i = 0; i < lightCount; i++) {
       (scene.lights + i)->type = 0;
       (scene.lights + i)->intensity = 1.0;
       (scene.lights + i)->position_direction = defaultVect;
     }
+    */
 
     return scene;
 }
 
+/*
 float compLight(scene_t *scene, vec3_t point, vec3_t normal) {
     float intensity = 0.0;
     vec3_t lVect;
@@ -151,9 +162,10 @@ float compLight(scene_t *scene, vec3_t point, vec3_t normal) {
     }
     return intensity;
 }
+*/
 
 float rsIntersect(vec3_t origin, vec3_t direction, sphere_t* sphere) {
-    int tClosest = 4294967295;
+    int tClosest = 2147483647;
     float radius = sphere->radius;
     vec3_t center = sphere->center; 
     //correct
